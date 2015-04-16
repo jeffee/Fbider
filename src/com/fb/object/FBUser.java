@@ -15,8 +15,6 @@ public class FBUser {
 
 	private String name;
 
-	private String link;
-
 	private String category;
 
 	private long likes;
@@ -33,10 +31,6 @@ public class FBUser {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getLink() {
-		return link;
 	}
 
 	public String getCategory() {
@@ -65,19 +59,33 @@ public class FBUser {
 	@Override
 	public String toString() {
 		return TextProcess.join(id, name, username, category, "" + likes, ""
-				+ talking_about_count, about, link);
+				+ talking_about_count, about);
 	}
 
 
 	public FBUser(JsonObject jobj) {
-		this.id = jobj.getString("id");
-		this.name = jobj.getString("name");
-		this.username = jobj.getString("username");
-		this.category = jobj.getString("category");
-		this.likes = jobj.getLong("likes");
-		this.talking_about_count = jobj.getLong("talking_about_count");
-		this.about = jobj.getString("about");
-		this.link = jobj.getString("link");
+		this.id = getString("id", jobj);
+		this.name = getString("name", jobj);
+		this.username = getString("username", jobj);
+		this.category = getString("category", jobj);
+		this.likes = getLong("likes", jobj);
+		this.talking_about_count = getLong("talking_about_count", jobj);
+		this.about = getString("about", jobj);
 	}
 
+	private String getString(String key, JsonObject jobj) {
+		try {
+			return jobj.getString(key);
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	private long getLong(String key, JsonObject jobj) {
+		try {
+			return jobj.getLong(key);
+		} catch (Exception e) {
+			return 0;
+		}
+	}
 }

@@ -26,8 +26,8 @@ public class DBProcess {
             conn = ConnPool.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
-            StringBuffer stb = new StringBuffer();
             while (rs.next()) {
+                StringBuffer stb = new StringBuffer();
                 stb.append(rs.getString(1));
                 for (int i = 2; i <= count; i++) {
                     stb.append(";"+rs.getString(i));
@@ -90,6 +90,7 @@ public class DBProcess {
 
 
     public static void main(String[] args) {
-
+        String sql = "select postID, likeAfter from facebook.sup_post_table";
+        DBProcess.get(sql, 2);
     }
 }

@@ -12,7 +12,11 @@ import java.util.*;
 
 /**
  * Created by Jeffee Chen on 2015/4/10.
+ * 更新已监控posts的新的comments
+ * 由于comments无法使用since等参数，返回的after在再次执行时也有问题（返回的after大都为Mw==或MQ==，执行时会出错），因此采用替代的方法，即每次都重新抓取，然后用新的数据替换旧数据
+ * **
  */
+
 public class CommentUpdate {
 
 

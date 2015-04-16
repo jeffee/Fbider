@@ -83,7 +83,6 @@ public class PostPage {
                 since = since.substring(0, index);
             }
         }
-        System.out.println("Since=" + since);
     }
 
     public String getNext() {

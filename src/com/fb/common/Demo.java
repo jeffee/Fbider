@@ -25,8 +25,12 @@ public class Demo {
     }
 
     public static void main(String[] args) {
-            String str = Common.parseTime("2015-04-14T06:27:16+0000");
-        System.out.println(str);
+        String str = "dkfjd;";
+                String[] strs = str.split(";");
+        System.out.println(strs.length);
+
+//            String str = Common.parseTime("2015-04-14T06:27:16+0000");
+//        System.out.println(str);
 //        Demo demo = new Demo();
 //        File file = new File("E:\\Data\\facebook\\ids\\todo\\蔡英文 Tsai Ing-wen\\hello");
 //        File [] files = file.listFiles();

@@ -17,34 +17,30 @@ public class SupUser {
         String sql = "select * from " + CommonData.USER_TABLE +" where uid='"+uid+"'";
         if (DBProcess.get(sql, 1).size() < 1) {       //不存在
             FBUser user = new FBUser(Crawl.get(uid + "?"));
-            System.out.println(user.toString());
-            System.out.println("not exist in usertable");
             insertUser(user);
         }
         sql = "select * from " + CommonData.SUP_USER_TABLE +" where uid='"+uid+"'";
         if (DBProcess.get(sql, 1).size() < 1) {       //不存在
             insertSupUser(uid);
-            System.out.println("not exist in sup usertable");
         }
+        System.out.println(CommonData.getNameByID(uid)+" has been added!");
     }
 
 
     private static void insertUser(FBUser user) {
-        String sql = "insert into " + CommonData.USER_TABLE + " (uid, uname, about, category, likes, talking_count, link) values('";
-        sql += user.getId() + "','" + user.getName() + "','" + user.getAbout() + "','" + user.getCategory() + "'," + user.getLikes() + "," + user.getTalking_about_count() + ",'" + user.getLink() + "')";
-        System.out.println(sql);
+        String sql = "insert into " + CommonData.USER_TABLE + " (uid, uname, about, category, likes, talking_count) values('";
+        sql += user.getId() + "','" + user.getName() + "','" + user.getAbout() + "','" + user.getCategory() + "'," + user.getLikes() + "," + user.getTalking_about_count() + ")";
         DBProcess.update(sql);
     }
 
     private static void insertSupUser(String uid) {
         String since = Common.getLastDate(CommonData.POST_UPDATE_PERIOD);
         String sql = "insert into " + CommonData.SUP_USER_TABLE + " (uid, since) values('" + uid + "','" +since+"')";
-        System.out.println(sql);
         DBProcess.update(sql);
     }
 
     public static void main(String[] args) {
-        SupUser.addSupUser("10150145806225128");
         SupUser.addSupUser("46251501064");
+        SupUser.addSupUser("10150145806225128");
     }
 }

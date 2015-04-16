@@ -34,32 +34,40 @@ public class SingleCrawl {
 
     /**初始化抓取的数据存放的目录**/
     public void initDir(String since, String until) {
+
         String subName = TargetDir.genFileName(uName, since + "." + until);
         idFile = TargetDir.genFileName(TargetDir.ID_DIR, subName);
         rawPostFile = TargetDir.genFileName(TargetDir.RAW_POST_DIR, subName);
         DBPostFile = TargetDir.genFileName(TargetDir.DB_POST_DIR, subName);
     }
 
+    public int get(String since) {
+        initDir(since, "");
+        String url = uID + "/posts?access_token=" + CommonData.MY_ACCESS_TOKEN + "&since=" + since + "&limit=100&";
+        return crawl(url);
+    }
+
     /**
      * *
-     *
      * @param since:起始时间，格式为2015-03-01 **
      * @param until:终止时间，格式同上
      */
-    public int get(String since, String until) {
+    public int get(String since, String until){
         if(since==null || until==null || since.trim().equals("") || until.trim().equals(""))
             return 0;
-
-        long bTime = System.currentTimeMillis();
         initDir(since, until);
         String url = uID + "/posts?access_token=" + CommonData.MY_ACCESS_TOKEN + "&since=" + since + "&until=" + until + "&limit=100&";
+        return crawl(url);
+    }
+
+    private int crawl(String url) {
+        long bTime = System.currentTimeMillis();
         JsonObject jObj = Crawl.get(url);
         PostPage page = new PostPage(jObj);
         long eTime = System.currentTimeMillis();
         System.out.println(eTime - bTime + " seconds");
 
         int count = page.getIdList().size();
-        System.out.println(count);
         if (count == 0)   //没有数据
             return 0;
 
