@@ -7,6 +7,8 @@ import com.fb.object.PostPage;
 import com.fb.object.TargetDir;
 import com.restfb.json.JsonObject;
 
+import java.util.List;
+
 /**
  * Created by Jeffee Chen on 2015/4/2.
  */
@@ -17,6 +19,7 @@ public class SingleCrawl {
     private String rawPostFile;
     private String DBPostFile;
     private String idFile;
+    private List<String> pIDList;
 
     /**
      * 记录抓取的最后时限，用于下一次抓取**
@@ -51,19 +54,19 @@ public class SingleCrawl {
         initDir(since, until);
         String url = uID + "/posts?access_token=" + CommonData.MY_ACCESS_TOKEN + "&since=" + since + "&until=" + until + "&limit=100&";
         JsonObject jObj = Crawl.get(url);
-
         PostPage page = new PostPage(jObj);
         long eTime = System.currentTimeMillis();
         System.out.println(eTime - bTime + " seconds");
 
         int count = page.getIdList().size();
+        System.out.println(count);
         if (count == 0)   //没有数据
             return 0;
 
 
         this.since = page.getSince();       //since是下次的起始时间，只需在这次的第一页中获取previous链接地址即可
 
-        if (page.getIdList().size() < 100) {         //ֻ说明没有多页
+        if (count < 100) {         //ֻ说明没有多页
             FileProcess.write(idFile, page.getIdList());
             FileProcess.write(rawPostFile, jObj.toString());
             FileProcess.write(DBPostFile, page.getPostList());

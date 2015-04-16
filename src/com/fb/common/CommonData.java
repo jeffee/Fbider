@@ -22,7 +22,7 @@ public class CommonData {
 
 
 	/***post更新周期，默认抓取两个月内的post****/
-	public final static int POST_UPDATE_PERIOD = 60;
+	public final static int POST_UPDATE_PERIOD = 30;
 
 	/***comment更新周期，默认更新一个月内的comments***/
 	public final static int COMMENT_UPDATE_PERIOD = 30;
@@ -31,7 +31,7 @@ public class CommonData {
 
 	public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBACocejqsiSjlHQQq5ZCI21ZArkwqWZCtoyaDZBEV4SJprR1Vn5gbDe9babcf0rD7ZBU5NXXqI46W9aVSCirRAraqce4LLIZCNfDaIlXaSG50FN5dGY7yJp2mNQVZAJTlk4fkKmWcIJ8IyG0YnZCtJGXNi9xYTdQPVsZBMs6ZBuzsBri7XYcJZBeRygZD";
 
-	public final static String ROOT_DIR = "E:\\Data\\homepages";
+	//public final static String ROOT_DIR = "E:\\Data\\homepages";
 
 	private static JsonObject uNameMap;
 

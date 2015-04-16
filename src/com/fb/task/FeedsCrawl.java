@@ -1,7 +1,9 @@
 package com.fb.task;
 
+import com.fb.DB.DBProcess;
 import com.fb.common.CommonData;
 import com.fb.common.FileProcess;
+import com.fb.common.Parse;
 import com.fb.crawl.Crawl;
 import com.fb.object.TargetDir;
 import com.restfb.json.JsonObject;
@@ -15,7 +17,6 @@ import java.util.List;
  * 获取所有的comments和likes，需要抓取的内容ID存放在
  */
 public class FeedsCrawl {
-    private String rawFeedFile;
     private List<String> idList;
     public FeedsCrawl() {
         idList = new ArrayList<>();
@@ -24,25 +25,17 @@ public class FeedsCrawl {
     public void get() {
         File[] uDirs = new File(TargetDir.ID_DIR).listFiles();
         for (File uDir : uDirs) {
-            System.out.println(uDir);
             File[] pDIrs = uDir.listFiles();
             for (File pDir : pDIrs) {
-                String subName = uDir.getName()+"\\"+pDir.getName();
-                rawFeedFile = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, subName);
-                if (pDir.isFile()) {
-                    getFromFile(pDir);
-
-                } else {
-                    getFromDir(pDir);
-                }
+                getFeeds(pDir);
                 System.out.println(pDir.getName()+" finished!");
-
             }
             if(uDir.listFiles().length<1)
                 uDir.delete();
         }
     }
 
+    /***处理完ID文件，备份回收**/
     private void backFile(File sFile) {
         String fPath = sFile.getPath();
         fPath = fPath.substring(fPath.indexOf("todo") + 5);
@@ -51,32 +44,59 @@ public class FeedsCrawl {
         File dir = new File(dFile.getParent());
         if(!dir.exists() || !dir.isDirectory())
             dir.mkdirs();
+        if (dFile.exists()&&dFile.isFile()) {
+            dFile.delete();
+        }
         sFile.renameTo(dFile);
     }
 
 
-    private void getFeedsByID(String id) {
-        String commentDir = TargetDir.genFileName(rawFeedFile, id, "comments");
-        String likeDir = TargetDir.genFileName(rawFeedFile, id, "likes");
-        if(new File(likeDir).exists()) {
+    private List<String> getFeedsByID(String pID, String createdTime) {
+        List<String> list = new ArrayList<>();
+        String uID = pID.substring(0, pID.indexOf("_"));
+        String likeDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, pID.split("_")[0], pID, "likes");
+        if (new File(likeDir).exists()) {
             System.out.println("Skip");
-            return;
+            return list;
         }
 
-        System.out.println("post "+id+" begins:>>>");
-        String commentsUrl = id+"/comments?limit=1000&access_token="+CommonData.MY_ACCESS_TOKEN+"&";
-        String likesUrl = id +"/likes?limit=1000&access_token="+CommonData.MY_ACCESS_TOKEN+"&";
-        System.out.println("Comments begins>>>>>");
-        List<JsonObject> commentList = Crawl.getPages(commentsUrl);
-        System.out.println("Likes    begins>>>>>>>>");
-        List<JsonObject> likeList = Crawl.getPages(likesUrl);
+        idList.add(pID);
+        System.out.println("post " + pID + " begins:>>>");
 
-        write(commentList, commentDir);
-        write(likeList, likeDir);
-        System.out.println(id+" post is finished!");
+        List<JsonObject> commentList = crawlComment(pID);
+        List<JsonObject> likeList = crawlLikes(pID);
+
+        String likeAfter = Parse.getAfter(likeList.get(likeList.size()-1));
+        String updateTime = Parse.getUpdatedTime(commentList.get(commentList.size() - 1));
+
+        String sql = String.format("insert into %s values ('%s','%s','%s','%s','%s')", CommonData.SUP_POST_TABLE, pID, pID.split("_")[0], likeAfter, createdTime, updateTime);
+        DBProcess.update(sql);
+        list.add(pID + ";" + updateTime + ";" + likeAfter);
+        System.out.println(pID + " post is finished!");
+        return list;
     }
 
-    private void write(List<JsonObject> list, String dir) {
+    public static List<JsonObject> crawlComment(String pID) {
+        String commentDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, pID.split("_")[0], pID, "comments");
+
+        System.out.println("Comments begins>>>>>");
+        String commentsUrl = pID + "/comments?limit=1000&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
+        List<JsonObject> commentList = Crawl.getPages(commentsUrl);
+        //String commentAfter = Parse.getAfter(commentList.get(commentList.size()-1));
+        write(commentList, commentDir);
+        return commentList;
+    }
+
+    public List<JsonObject> crawlLikes(String pID) {
+        String likeDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, pID.split("_")[0], pID, "likes");
+        System.out.println("Likes begins>>>>>>>>");
+        String likesUrl = pID + "/likes?limit=1000&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
+        List<JsonObject> likeList = Crawl.getPages(likesUrl);
+        write(likeList, likeDir);
+        return likeList;
+    }
+    
+    private static void write(List<JsonObject> list, String dir) {
         int count = 1;
         for (JsonObject jObj : list) {
             FileProcess.write(dir + "\\" + count++, jObj.toString());
@@ -84,10 +104,25 @@ public class FeedsCrawl {
 
     }
 
-    private void getFromFile(File pDir) {
+    private void getFeeds(File pDir) {
+        if (pDir.isFile()) {
+            getFromFile(pDir);
+        } else {
+            getFromDir(pDir);
+        }
+    }
+
+    private List<String> getFromFile(File pDir) {
         List<String> list = FileProcess.read(pDir);
-        list.forEach(this::getFeedsByID);
+        List<String> updateList = new ArrayList<>();
+        for (String line : list) {
+            if(line==null || line.equals(""))
+                continue;
+            String[] infos = line.split(";");
+            getFeedsByID(infos[0], infos[1]);
+        }
         backFile(pDir);
+        return updateList;
     }
 
     private void getFromDir(File pDir) {
@@ -102,6 +137,5 @@ public class FeedsCrawl {
     public static void main(String[] args) {
         FeedsCrawl crawl = new FeedsCrawl();
         crawl.get();
-
     }
 }

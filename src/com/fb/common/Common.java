@@ -7,6 +7,7 @@ package com.fb.common;
 
 import com.restfb.json.JsonObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,6 +49,15 @@ public class Common {
         cal.setTime(new Date());
         cal.add(Calendar.DATE, -days);
         return format.format(cal.getTime());
+    }
+
+    /****facebook时间格式转换
+     * @param dateTime: facebook返回的时间，格式为“2015-04-14T06:27:16+0000”
+     * ***/
+    public static String parseTime(String dateTime) {
+        String timeStr = dateTime.substring(0, dateTime.indexOf("+")).replace('T', ' ');
+        //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return timeStr;
     }
 
     public static void main(String[] args) {

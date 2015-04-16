@@ -32,7 +32,7 @@ public class Crawl {
 	public static JsonObject get(String url) {
 		url = UrlProcess.updateUrl(url);
 		try {
-			System.out.println(url);
+//			System.out.println(url);
 			return client.fetchObject(url + "", JsonObject.class);
 		} catch (FacebookOAuthException e) {
 			e.printStackTrace();
@@ -69,7 +69,10 @@ public class Crawl {
 		List<JsonObject> list = new ArrayList<>();
 		String next;
 		JsonObject jObj = get(url);
-		list.add(jObj);
+		if(jObj.getJsonArray("data").length()<1)		//拿到的数据为空，直接返回
+			return list;
+
+		list.add(jObj);					//存储当前数据
 		try {
 			next = jObj.getJsonObject("paging").getString("next") + "&";
 		} catch (Exception e) {

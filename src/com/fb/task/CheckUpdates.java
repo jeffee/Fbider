@@ -46,8 +46,9 @@ public class CheckUpdates {
             }
         }
 
-        FeedsCrawl crawl = new FeedsCrawl();
-        crawl.get();
+        System.out.println("HELLO&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&7");
+/*        FeedsCrawl crawl = new FeedsCrawl();
+        crawl.get();*/
     }
 
     private void updateTime(String uid, String since) {
@@ -58,10 +59,5 @@ public class CheckUpdates {
     public static void main(String[] args) {
         CheckUpdates updates = new CheckUpdates();
         updates.update();
-//        Map map = updates.getUpdateTimes();
-//        Iterator iterator = map.keySet().iterator();
-//        while (iterator.hasNext()) {
-//            System.out.println(iterator.next());
-//        }
     }
 }

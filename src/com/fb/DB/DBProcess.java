@@ -28,8 +28,9 @@ public class DBProcess {
             rs = stmt.executeQuery(sql);
             StringBuffer stb = new StringBuffer();
             while (rs.next()) {
-                for (int i = 1; i <= count; i++) {
-                    stb.append(rs.getString(i) + ",");
+                stb.append(rs.getString(1));
+                for (int i = 2; i <= count; i++) {
+                    stb.append(";"+rs.getString(i));
                 }
                 list.add(stb.toString());
             }
@@ -51,8 +52,6 @@ public class DBProcess {
             conn = ConnPool.getConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
-            stmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

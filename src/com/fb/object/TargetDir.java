@@ -5,19 +5,19 @@ package com.fb.object;
  */
 public class TargetDir {
 
-    /***¸ùÄ¿Â¼**/
+    /***æ ¹ç›®å½•**/
     public final static String ROOTDIR="E:\\Data\\facebook";
 
-    /****´æ·ÅÓÃ»§·¢²¼ÄÚÈİÒ³ÃæµÄÔ­Ê¼ÎÄ¼ş***/
+    /****å­˜æ”¾ç”¨æˆ·å‘å¸ƒå†…å®¹é¡µé¢çš„åŸå§‹æ–‡ä»¶***/
     public static String RAW_POST_DIR = genFileName(ROOTDIR, "raw pages", "posts");
 
-    /****´æ´¦Àí¹ıµÄÓÃ»§·¢²¼ÄÚÈİ£¬µÈ´ı±»´æÊı¾İ¿â****/
+    /****å­˜å¤„ç†è¿‡çš„ç”¨æˆ·å‘å¸ƒå†…å®¹ï¼Œç­‰å¾…è¢«å­˜æ•°æ®åº“****/
     public static String DB_POST_DIR = genFileName(ROOTDIR, "DB files", "posts");
 
-    /***´æ·ÅÓÃ»§ÄÚÈİËù»ñµÃµÄÆÀÂÛ¡¢µãÔŞµÈĞÅÏ¢µÄÔ­Ê¼Ò³Ãæ***/
+    /***å­˜æ”¾ç”¨æˆ·å†…å®¹æ‰€è·å¾—çš„è¯„è®ºã€ç‚¹èµç­‰ä¿¡æ¯çš„åŸå§‹é¡µé¢***/
     public static String RAW_FEEDS_DIR = genFileName(ROOTDIR, "raw pages", "feeds");
 
-    /*****´æ·Å´¦Àí¹ıµÄÆÀÂÛ¡¢µãÔŞ£¬µÈ´ı´æÈëÊı¾İ¿â*****/
+    /*****å­˜æ”¾å¤„ç†è¿‡çš„è¯„è®ºã€ç‚¹èµï¼Œç­‰å¾…å­˜å…¥æ•°æ®åº“*****/
     public static String DB_FEEDS_DIR = genFileName(ROOTDIR, "DB files", "feeds");
 
     public static String ID_DIR = genFileName(ROOTDIR, "ids", "todo");

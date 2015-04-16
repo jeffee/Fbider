@@ -36,6 +36,7 @@ public class FileProcess {
 	}
 	
 	public static void write(String fileName, List<String> infoList){
+		System.out.println(fileName);
 		FileWriter fWriter;
 		try {
 			File dFile = new File(fileName);
