@@ -1,100 +1,68 @@
 package com.fb.task;
 
 import com.fb.DB.DBProcess;
-import com.fb.common.Common;
 import com.fb.common.CommonData;
-import com.fb.common.Parse;
+import com.fb.common.FileProcess;
 import com.fb.crawl.Crawl;
-import com.restfb.json.JsonArray;
+import com.fb.object.TargetDir;
 import com.restfb.json.JsonObject;
 
-import java.util.*;
+import java.io.File;
+import java.util.List;
 
 /**
- * Created by Jeffee Chen on 2015/4/10.
- * 更新已监控posts的新的comments
- * 由于comments无法使用since等参数，返回的after在再次执行时也有问题（返回的after大都为Mw==或MQ==，执行时会出错），因此采用替代的方法，即每次都重新抓取，然后用新的数据替换旧数据
- * **
+ * Created by Jeffee Chen on 2015/4/3.
+ * 更新所有的comments和likes，需要抓取的内容ID存放在
  */
-
 public class CommentUpdate {
 
 
     /**
-     * 初始化数据库中抓取的post的评论和点赞的最终时间
-     * ***
-     */
-    private static Map<String, String> initDBMap() {
-        Map<String, String> commentMap = new HashMap<>();
-        String sql = "select postID, updatedTime from " + CommonData.SUP_POST_TABLE;
-        List<String> list = DBProcess.get(sql, 2);
-        for (String line : list) {
-            String[] infos = line.split(";");
-            String updateTime = infos[1];
-            if (updateTime.indexOf(".") != -1)
-                updateTime = updateTime.substring(0, updateTime.indexOf("."));
-            commentMap.put(infos[0], updateTime);
-        }
-        return commentMap;
-    }
-
-    /**
-     * 获取Facebook中post的更新时间
-     *
-     * @todo 每次搜索的时候，提取POST_UPDATE_PERIOD时间内的post的更新时间
-     * **
-     */
-    private static Map<String, String> initFBMap() {
-        Map<String, String> fbMap = new HashMap<>();
-        String since = Common.getLastDate(CommonData.POST_UPDATE_PERIOD);
-        if (since == null || since.trim().equals(""))
-            return fbMap;
-
-        String sql = "select userID FROM " + CommonData.SUP_POST_TABLE + " GROUP BY userID";  //获取表中所有的用户ID
-        List<String> list = DBProcess.get(sql, 1);
-        for (String uid : list) {
-            String url = uid + "/posts?fields=id,updated_time&limit=100&since=" + since;
-            JsonArray array = Crawl.get(url).getJsonArray("data");
-            if (array.length() == 0)
-                return fbMap;
-
-            for (int i = 0; i < array.length(); i++) {
-                JsonObject obj = array.getJsonObject(i);
-                String id = obj.getString("id");
-                String updatedTime = obj.getString("updated_time");
-                updatedTime = Common.parseTime(updatedTime);
-                fbMap.put(id, updatedTime);
-            }
-        }
-        return fbMap;
-    }
-
-
-    /**
-     * 更新用户发布的post**
+     * 更新已监控的posts的新的like
+     * 完成之后更新like的after值，提供下次更新的入口地址
      */
     public static void updateComments() {
-        Map<String, String> fbMap = initFBMap();
-        Map<String, String> dbMap = initDBMap();
-        Iterator<String> iter = dbMap.keySet().iterator();
-        while (iter.hasNext()) {
-            String pID = iter.next();
-            String dbTime = dbMap.get(pID);
-            String fbTime = fbMap.get(pID);
+        System.out.println("Please wait，Checking comments …………");
+        String sql = "select postID, commentAfter from " + CommonData.SUP_POST_TABLE;
+        List<String> list = DBProcess.get(sql, 2);
+        // System.out.println(list.toString());
+        for (String line : list) {
+            String[] strs = line.split(";");
+            String likeUrl = String.format("%s/comments?limit=1000&filter=stream&summary=1&access_token=%s&", strs[0], CommonData.MY_ACCESS_TOKEN);
 
-            if (!dbTime.equals(fbTime)) {       //不一致说明有更新
-                List<JsonObject> list = FeedsCrawl.crawlComment(pID);
-                String updatedTime = Parse.getUpdatedTime(list.get(list.size() - 1));
-                updateTime(pID, updatedTime);
-            } else System.out.println("no update ************");
+            if (strs.length > 1) {
+                String after = (strs[1].length() < 5) ? "" : strs[1];
+                likeUrl = String.format("%s/comments?limit=1000&filter=stream&summary=1&after=%s&access_token=%s&", strs[0], after, CommonData.MY_ACCESS_TOKEN);
+            }
+            List<JsonObject> jsonList = Crawl.getPages(likeUrl);
+            if (jsonList.size() < 1) {
+                continue;
+            }
+
+            JsonObject lastJobj = jsonList.get(jsonList.size() - 1);
+            String after = lastJobj.getJsonObject("paging").getJsonObject("cursors").getString("after");
+            sql = String.format("insert into %s values ('%s','','','2015-01-01','2015-01-01') on duplicate key update commentAfter='%s'", CommonData.SUP_POST_TABLE, strs[0], after);
+            DBProcess.update(sql);
+
+            System.out.println(strs[0] + " updated");
+            String uname = CommonData.getNameByID(strs[0].split("_")[0]);
+            String rawFeedFile = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uname, strs[0], "comments");
+            write(jsonList, rawFeedFile);
         }
     }
 
 
-    private static void updateTime(String pID, String updateTime) {
-        String sql = "update " + CommonData.SUP_POST_TABLE + " set updatedTime='" + updateTime + "' where postID='" + pID + "'";
-        DBProcess.update(sql);
+    private static void write(List<JsonObject> list, String dir) {
+        int count = 1;
+        File file = new File(dir);
+        if (file.exists() && file.isDirectory())
+            count = file.listFiles().length + 1;
+
+        for (JsonObject jObj : list) {
+            FileProcess.write(dir + "\\" + count++, jObj.toString());
+        }
     }
+
 
     public static void main(String[] args) {
         CommentUpdate.updateComments();

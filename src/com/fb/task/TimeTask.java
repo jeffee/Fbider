@@ -1,5 +1,7 @@
 package com.fb.task;
 
+import com.fb.common.CommonData;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -31,9 +33,9 @@ public class TimeTask {
                 FeedsCrawl feedsCrawl = new FeedsCrawl();
                 feedsCrawl.get();
                 CommentUpdate.updateComments();
-                LikesUpdate.updateLikes();
+                LikeUpdate.updateLikes();
 
-                System.out.println(" 第 " + ++count + " 次执行 ");
+                System.out.println("于 "+ CommonData.dateFormat.format(new Date())+" 第 " + ++count + " 次执行 ");
             }
         };
 

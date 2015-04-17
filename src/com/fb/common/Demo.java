@@ -25,9 +25,8 @@ public class Demo {
     }
 
     public static void main(String[] args) {
-        String str = "dkfjd;";
-                String[] strs = str.split(";");
-        System.out.println(strs.length);
+       String str = String.join(";", "1", "2", "3");
+        System.out.println(str);
 
 //            String str = Common.parseTime("2015-04-14T06:27:16+0000");
 //        System.out.println(str);

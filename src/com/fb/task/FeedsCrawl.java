@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by Jeffee Chen on 2015/4/3.
- * 获取所有的comments和likes，需要抓取的内容ID存放在
+ * 获取所有的comments和likes
  */
 public class FeedsCrawl {
     private List<String> idList;
@@ -69,15 +69,17 @@ public class FeedsCrawl {
         List<JsonObject> commentList = crawlComment(pID);
         List<JsonObject> likeList = crawlLikes(pID);
         String likeAfter = "";
+        String commentAfter = "";
         if (likeList.size() >= 1)
             likeAfter = Parse.getAfter(likeList.get(likeList.size() - 1));
-        String updateTime = createdTime;
-        if (commentList.size() >= 1)
-            updateTime = Parse.getUpdatedTime(commentList.get(commentList.size() - 1));
 
-        String sql = String.format("insert into %s values ('%s','%s','%s','%s','%s')", CommonData.SUP_POST_TABLE, pID, pID.split("_")[0], likeAfter, createdTime, updateTime);
+        if (commentList.size() >= 1) {
+            commentAfter = Parse.getAfter(commentList.get(commentList.size() - 1));
+        }
+
+        String sql = String.format("insert into %s values ('%s','%s','%s','%s','%s')", CommonData.SUP_POST_TABLE, pID, pID.split("_")[0], commentAfter, likeAfter, createdTime);
         DBProcess.update(sql);
-        list.add(pID + ";" + updateTime + ";" + likeAfter);
+        list.add(pID + ";" + commentAfter + ";" + likeAfter);
         System.out.println(pID + " post is finished!");
         return list;
     }
@@ -86,10 +88,9 @@ public class FeedsCrawl {
         String uName = CommonData.getNameByID(pID.split("_")[0]);
         String commentDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uName, pID, "comments");
 
-        System.out.println("Comments begins>>>>>");
-        String commentsUrl = pID + "/comments?limit=1000&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
+        //System.out.println("Comments begins>>>>>");
+        String commentsUrl = pID + "/comments?limit=1000&filter=stream&summary=1&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
         List<JsonObject> commentList = Crawl.getPages(commentsUrl);
-        //String commentAfter = Parse.getAfter(commentList.get(commentList.size()-1));
         write(commentList, commentDir);
         return commentList;
     }
@@ -98,7 +99,7 @@ public class FeedsCrawl {
         String uName = CommonData.getNameByID(pID.split("_")[0]);
         String likeDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uName, pID, "likes");
         System.out.println("Likes begins>>>>>>>>");
-        String likesUrl = pID + "/likes?limit=1000&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
+        String likesUrl = pID + "/likes?limit=1000&summary=1&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
         List<JsonObject> likeList = Crawl.getPages(likesUrl);
         write(likeList, likeDir);
         return likeList;

@@ -31,8 +31,6 @@ public class CommonData {
 
 	public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBACocejqsiSjlHQQq5ZCI21ZArkwqWZCtoyaDZBEV4SJprR1Vn5gbDe9babcf0rD7ZBU5NXXqI46W9aVSCirRAraqce4LLIZCNfDaIlXaSG50FN5dGY7yJp2mNQVZAJTlk4fkKmWcIJ8IyG0YnZCtJGXNi9xYTdQPVsZBMs6ZBuzsBri7XYcJZBeRygZD";
 
-	//public final static String ROOT_DIR = "E:\\Data\\homepages";
-
 	private static JsonObject uNameMap;
 
 	private static List<String> userList;

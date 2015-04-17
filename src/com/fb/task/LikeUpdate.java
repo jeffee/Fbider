@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Jeffee Chen on 2015/4/3.
  * 更新所有的comments和likes，需要抓取的内容ID存放在
  */
-public class LikesUpdate {
+public class LikeUpdate {
 
 
     /**
@@ -22,15 +22,15 @@ public class LikesUpdate {
      * 完成之后更新like的after值，提供下次更新的入口地址
      */
     public static void updateLikes() {
+        System.out.println("Please wait，Checking likes …………");
         String sql = "select postID, likeAfter from " + CommonData.SUP_POST_TABLE;
         List<String> list = DBProcess.get(sql, 2);
-       // System.out.println(list.toString());
         for (String line : list) {
             String[] strs = line.split(";");
-            String likeUrl = String.format("%s/likes?limit=1000&access_token=%s&", strs[0], CommonData.MY_ACCESS_TOKEN);
+            String likeUrl = String.format("%s/likes?limit=1000&summary=1&access_token=%s&", strs[0], CommonData.MY_ACCESS_TOKEN);
 
             if(strs.length>1)
-                likeUrl = String.format("%s/likes?limit=1000&after=%s&access_token=%s&", strs[0], strs[1], CommonData.MY_ACCESS_TOKEN);
+                likeUrl = String.format("%s/likes?limit=1000&summary=1&after=%s&access_token=%s&", strs[0], strs[1], CommonData.MY_ACCESS_TOKEN);
 
             List<JsonObject> jsonList = Crawl.getPages(likeUrl);
             if (jsonList.size() < 1)
@@ -41,6 +41,7 @@ public class LikesUpdate {
             sql = String.format("insert into %s values ('%s','','','2015-01-01','2015-01-01') on duplicate key update LikeAfter='%s'", CommonData.SUP_POST_TABLE, strs[0], after);
             DBProcess.update(sql);
 
+            System.out.println(strs[0] + " updated");
             String uname = CommonData.getNameByID(strs[0].split("_")[0]);
             String rawFeedFile = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uname, strs[0], "likes");
             write(jsonList, rawFeedFile);
@@ -56,14 +57,12 @@ public class LikesUpdate {
             count = file.listFiles().length + 1;
 
         for (JsonObject jObj : list) {
-           // System.out.println("write :" + dir);
             FileProcess.write(dir + "\\" + count++, jObj.toString());
         }
-        System.out.println("likes has been updated@@@");
     }
 
 
     public static void main(String[] args) {
-        LikesUpdate.updateLikes();
+        LikeUpdate.updateLikes();
     }
 }
