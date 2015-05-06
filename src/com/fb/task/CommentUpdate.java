@@ -4,10 +4,13 @@ import com.fb.DB.DBProcess;
 import com.fb.common.CommonData;
 import com.fb.common.FileProcess;
 import com.fb.crawl.Crawl;
+import com.fb.object.Comment;
 import com.fb.object.TargetDir;
+import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,6 +51,9 @@ public class CommentUpdate {
             String uname = CommonData.getNameByID(strs[0].split("_")[0]);
             String rawFeedFile = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uname, strs[0], "comments");
             write(jsonList, rawFeedFile);
+
+            String commentDBDir =  TargetDir.genFileName(TargetDir.DB_FEEDS_DIR, strs[0].split("_")[0], strs[0]);
+            writeDB(strs[0], jsonList, commentDBDir);
         }
     }
 
@@ -63,6 +69,21 @@ public class CommentUpdate {
         }
     }
 
+    /***写评论文件，然后导入数据库**/
+    private static void writeDB(String pID, List<JsonObject> list, String dir) {
+        List<String> infoList = new ArrayList<>();
+        for (JsonObject jObj : list) {
+            JsonArray array = jObj.getJsonArray("data");
+            for (int i = 0; i < array.length(); i++) {
+                JsonObject obj = (JsonObject)array.get(i);
+                Comment comment = new Comment(pID, obj);
+                infoList.add(comment.toString());
+            }
+        }
+        FileProcess.write(dir, infoList);
+        DBProcess.inport(dir, CommonData.COMMETN_TABLE);
+        System.out.println(infoList.size()+" posts have been stored");
+    }
 
     public static void main(String[] args) {
         CommentUpdate.updateComments();

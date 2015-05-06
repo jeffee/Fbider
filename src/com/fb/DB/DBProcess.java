@@ -1,7 +1,9 @@
 package com.fb.DB;
 
+import com.fb.common.CommonData;
 import org.apache.commons.dbutils.DbUtils;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +47,28 @@ public class DBProcess {
         return list;
     }
 
+    public static String getString(String sql) {
+        Connection conn = null;
+        ResultSet rs = null;
+        Statement stmt = null;
+        String result = "";
+        try {
+            conn = ConnPool.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(stmt);
+            DbUtils.closeQuietly(conn);
+        }
+        return result;
+    }
+
     public static void update(String sql) {
         Connection conn = null;
         Statement stmt = null;
@@ -83,14 +107,36 @@ public class DBProcess {
             DbUtils.closeQuietly(stmt);
             DbUtils.closeQuietly(conn);
         }
-
-
         return map;
     }
 
+    public static void inport(File file, String table){
+        inport(file.getPath(), table);
+    }
+
+    public static void inport(String fileName, String table) {
+        String fStr = fileName.replaceAll("\\\\", "/");
+        String sql = "load data infile '" + fStr + "' ignore into table " + table + " fields terminated by ';';";
+       // System.out.println(sql);
+        Connection conn = ConnPool.getConnection();
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+            new File(fileName).delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.closeQuietly(stmt);
+            DbUtils.closeQuietly(conn);
+        }
+    }
 
     public static void main(String[] args) {
-        String sql = "select postID, likeAfter from facebook.sup_post_table";
-        DBProcess.get(sql, 2);
+        String sql = "select since from "+CommonData.SUP_USER_TABLE+" WHERE uid=\"10150145806225128\"";
+        String str = DBProcess.getString(sql);
+        System.out.println(str);
+       // DBProcess.inport("E:/Data/facebook/raw pages/feeds/蔡英文 Tsai Ing-wen/46251501064_10152633261031065/comments/12", CommonData.COMMETN_TABLE);
+        //DBProcess.get(sql, 2);
     }
 }

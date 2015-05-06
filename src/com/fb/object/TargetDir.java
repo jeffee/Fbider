@@ -24,6 +24,9 @@ public class TargetDir {
 
     public static String BACK_DIR = genFileName(ROOTDIR, "ids", "finished");
 
+    public static String LOG_DIR = genFileName(ROOTDIR, "logs");
+
+    public static String PERSONAL_DIR = genFileName(ROOTDIR, "personal");
     public static String genFileName(String arg1, String... args) {
         String str = arg1;
         for(String arg:args)

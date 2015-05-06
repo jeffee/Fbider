@@ -6,21 +6,29 @@
  ************************************************/
 package com.fb.crawl;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import com.fb.common.CommonData;
+import com.fb.common.FileProcess;
 import com.fb.common.UrlProcess;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Version;
+import com.restfb.exception.FacebookNetworkException;
 import com.restfb.exception.FacebookOAuthException;
 import com.restfb.json.JsonObject;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 public class Crawl {
 
 	@SuppressWarnings("deprecation")
 	private static FacebookClient client;
 
+	private static long PERIOD = 60*1000;
 	static {
 		initClient();
 	}
@@ -32,24 +40,35 @@ public class Crawl {
 	public static JsonObject get(String url) {
 		url = UrlProcess.updateUrl(url);
 		try {
-//			System.out.println(url);
-			return client.fetchObject(url + "", JsonObject.class);
+			//System.out.println(url);
+			return client.fetchObject(url + "&" + "", JsonObject.class);
 		} catch (FacebookOAuthException e) {
-			e.printStackTrace();
-			if(e.getErrorCode()==2){
+			if (e.getErrorCode() == 2) {			//facebook错误，只需重新执行就可以
 				initClient();
 				return get(url);
 			}
+		} catch (FacebookNetworkException e) {
+			 if (e.getHttpStatusCode() == null) {		//网络错误
+				try {
+					System.err.println("Haha ************************");
+					System.err.println("Network error, please check the network connection!");
+					System.err.println("Now is " + CommonData.dateFormat.format(new Date()));
+					Thread.sleep(PERIOD);
+					System.out.println("hello");
+					initClient();
+					return get(url);
 
-/*			System.out.println(e.getErrorCode());
-			System.err.println("The client has been re-initiated^^^^^^^^^^");
-			initClient();
-			return get(url);*/
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}
 
+	private static void waitForNet() {
 
+	}
 
 	private static void initClient() {
 		client = new DefaultFacebookClient(Version.VERSION_2_2);
@@ -85,12 +104,9 @@ public class Crawl {
 	}
 
 	public static void main(String[] args) {
-		String url = "232716627404_10152748927117405?";
-		List<JsonObject> list = Crawl.getPages(url);
-		for (JsonObject obj : list) {
-			System.out.println(obj.toString());
-		}
-		System.out.println(list.size());
+		String url = "46251501064_10152633836061065/comments?limit=1000";
+		JsonObject obj = Crawl.get(url);
+		FileProcess.write("E:\\cai.txt", obj.toString());
 	}
 
 }

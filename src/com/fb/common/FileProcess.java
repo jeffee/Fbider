@@ -36,23 +36,25 @@ public class FileProcess {
 	}
 	
 	public static void write(String fileName, List<String> infoList){
+		File dFile = new File(fileName);
+		write(dFile, infoList);
+	}
+
+	public static void write(File dFile, List<String> infoList) {
 		FileWriter fWriter;
 		try {
-			File dFile = new File(fileName);
 			checkDir(dFile);
 			fWriter = new FileWriter(dFile);
 			for (int i = 0; i < infoList.size(); i++) {
-			fWriter.write(infoList.get(i));
-			fWriter.write("\r\n");
+				fWriter.write(infoList.get(i));
+				fWriter.write("\r\n");
 			}
 			fWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
-
  
 	public static void write(String fileName, String info){
 		FileWriter fw;

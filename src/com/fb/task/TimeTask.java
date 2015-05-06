@@ -1,11 +1,9 @@
 package com.fb.task;
 
+import com.fb.DB.DBProcess;
 import com.fb.common.CommonData;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Created by Jeffee Chen on 2015/4/7.
@@ -16,6 +14,8 @@ public class TimeTask {
     static int count = 0;
 
     private static final long PERIOD = 6 * 60 * 60 * 1000;
+
+    private static final long DAY_PERIOD = 24 * 60 * 60 * 1000;
 
     public static void main(String[] args) {
         operateOnTime();
@@ -29,13 +29,15 @@ public class TimeTask {
 
             @Override
             public void run() {
-                CheckUpdates.update();
-                FeedsCrawl feedsCrawl = new FeedsCrawl();
+                CheckUpdates.update();                  //更新监控用户新发布的posts
+
+                FeedsCrawl feedsCrawl = new FeedsCrawl();             //抓取上一步操作所获取到的新posts的评论和点赞
                 feedsCrawl.get();
-                CommentUpdate.updateComments();
+
+                CommentUpdate.updateComments();                //更新监控posts的评论和点赞
                 LikeUpdate.updateLikes();
 
-                System.out.println("于 "+ CommonData.dateFormat.format(new Date())+" 第 " + ++count + " 次执行 ");
+                System.out.println("于 " + CommonData.dateFormat.format(new Date()) + " 第 " + ++count + " 次执行 ");
             }
         };
 

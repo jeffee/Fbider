@@ -32,7 +32,7 @@ public class LikeUpdate {
             if(strs.length>1)
                 likeUrl = String.format("%s/likes?limit=1000&summary=1&after=%s&access_token=%s&", strs[0], strs[1], CommonData.MY_ACCESS_TOKEN);
 
-            List<JsonObject> jsonList = Crawl.getPages(likeUrl);
+            List<JsonObject> jsonList = Crawl.getPages(likeUrl);    //没有更新
             if (jsonList.size() < 1)
                 continue;
 
@@ -40,6 +40,7 @@ public class LikeUpdate {
             String after = lastJobj.getJsonObject("paging").getJsonObject("cursors").getString("after");
             sql = String.format("insert into %s values ('%s','','','2015-01-01','2015-01-01') on duplicate key update LikeAfter='%s'", CommonData.SUP_POST_TABLE, strs[0], after);
             DBProcess.update(sql);
+
 
             System.out.println(strs[0] + " updated");
             String uname = CommonData.getNameByID(strs[0].split("_")[0]);

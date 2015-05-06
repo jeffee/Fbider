@@ -29,20 +29,23 @@ public class CommonData {
 
 	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+	public final static SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 	public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBACocejqsiSjlHQQq5ZCI21ZArkwqWZCtoyaDZBEV4SJprR1Vn5gbDe9babcf0rD7ZBU5NXXqI46W9aVSCirRAraqce4LLIZCNfDaIlXaSG50FN5dGY7yJp2mNQVZAJTlk4fkKmWcIJ8IyG0YnZCtJGXNi9xYTdQPVsZBMs6ZBuzsBri7XYcJZBeRygZD";
 
 	private static JsonObject uNameMap;
 
 	private static List<String> userList;
 
-	public static String USER_TABLE = "facebook.user_table";
+	public static String USER_TABLE = "user_table";
 
-	public static String SUP_USER_TABLE="facebook.sup_user_table";
+	public static String SUP_USER_TABLE="sup_user_table";
 
-	public static String POST_TABLE = "facebook.post_table";
+	public static String POST_TABLE = "post_table";
 
-	public static String SUP_POST_TABLE = "facebook.sup_post_table";
+	public static String SUP_POST_TABLE = "sup_post_table";
 
+	public static String COMMETN_TABLE = "comment_table";
 
 
 	static {

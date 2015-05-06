@@ -17,7 +17,7 @@ public class ConnPool {
 
 	private static DataSource dataSource;
 
-	private static String CONN_URL = "jdbc:mysql://127.0.0.1:3306/";
+	private static String CONN_URL = "jdbc:mysql://192.168.1.77:3306/facebook?autoReconnect=true";
 	private static String USER = "root";
 
 	private static String PASS = "123456";
@@ -49,6 +49,10 @@ public class ConnPool {
 		ds.setMaxActive(20);
 		ds.setMaxIdle(5);
 		ds.setMaxWait(5000);
+		ds.setTestOnBorrow(true);
+		ds.setTestOnReturn(true);
+		ds.setTestWhileIdle(true);
+		ds.setValidationQuery("select count(*) from DUAL");
 		dataSource = ds;
 	}
 

@@ -42,8 +42,6 @@ public class CheckUpdates {
             }
         }
 
-/*        FeedsCrawl crawl = new FeedsCrawl();
-        crawl.get();*/
     }
 
     private static void updateTime(String uid, String since) {

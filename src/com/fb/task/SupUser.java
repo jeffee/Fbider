@@ -40,7 +40,7 @@ public class SupUser {
     }
 
     public static void main(String[] args) {
-        SupUser.addSupUser("46251501064");
-        SupUser.addSupUser("10150145806225128");
+        SupUser.addSupUser("100009412503592");
+        //SupUser.addSupUser("10150145806225128");
     }
 }

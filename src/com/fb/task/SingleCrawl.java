@@ -1,5 +1,6 @@
 package com.fb.task;
 
+import com.fb.DB.DBProcess;
 import com.fb.common.CommonData;
 import com.fb.common.FileProcess;
 import com.fb.crawl.Crawl;
@@ -7,6 +8,7 @@ import com.fb.object.PostPage;
 import com.fb.object.TargetDir;
 import com.restfb.json.JsonObject;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -19,7 +21,6 @@ public class SingleCrawl {
     private String rawPostFile;
     private String DBPostFile;
     private String idFile;
-    private List<String> pIDList;
 
     /**
      * 记录抓取的最后时限，用于下一次抓取**
@@ -34,11 +35,10 @@ public class SingleCrawl {
 
     /**初始化抓取的数据存放的目录**/
     public void initDir(String since, String until) {
-
         String subName = TargetDir.genFileName(uName, since + "." + until);
         idFile = TargetDir.genFileName(TargetDir.ID_DIR, subName);
         rawPostFile = TargetDir.genFileName(TargetDir.RAW_POST_DIR, subName);
-        DBPostFile = TargetDir.genFileName(TargetDir.DB_POST_DIR, subName);
+        DBPostFile = TargetDir.genFileName(TargetDir.DB_POST_DIR, uID, since + "." + until);
     }
 
     public int get(String since) {
@@ -78,10 +78,12 @@ public class SingleCrawl {
             FileProcess.write(idFile, page.getIdList());
             FileProcess.write(rawPostFile, jObj.toString());
             FileProcess.write(DBPostFile, page.getPostList());
+            DBProcess.inport(DBPostFile, CommonData.POST_TABLE);
         } else {                       //有多页需要处理
             FileProcess.write(idFile + "\\1", page.getIdList());
             FileProcess.write(rawPostFile + "\\1", jObj.toString());
             FileProcess.write(DBPostFile + "\\1", page.getPostList());
+            DBProcess.inport(DBPostFile + "\\1", CommonData.POST_TABLE);
             morePage(page.getNext(), 1);
         }
         return count;
@@ -97,6 +99,7 @@ public class SingleCrawl {
 
         count++;
         long bTime = System.currentTimeMillis();
+    //    System.out.println(next);
         JsonObject jObj = Crawl.get(next);
         PostPage page = new PostPage(jObj);
         if (page.getIdList().size() == 0)
@@ -104,11 +107,13 @@ public class SingleCrawl {
 
         FileProcess.write(idFile + "\\" + count, page.getIdList());
         FileProcess.write(rawPostFile + "\\" + count, jObj.toString());
+
         FileProcess.write(DBPostFile + "\\" + count, page.getPostList());
+        DBProcess.inport(DBPostFile + "\\" + count, CommonData.POST_TABLE);
+
         long eTime = System.currentTimeMillis();
-        System.out.println(eTime - bTime + " seconds");
         morePage(page.getNext(), count);
-        System.out.println(count + " pages finished...");
+        System.out.println(count + " pages finished in "+ (eTime - bTime) + " seconds");
     }
 
     public static void main(String[] args) {

@@ -5,7 +5,9 @@ import com.fb.common.CommonData;
 import com.fb.common.FileProcess;
 import com.fb.common.Parse;
 import com.fb.crawl.Crawl;
+import com.fb.object.Comment;
 import com.fb.object.TargetDir;
+import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 
 import java.io.File;
@@ -85,13 +87,15 @@ public class FeedsCrawl {
     }
 
     public static List<JsonObject> crawlComment(String pID) {
-        String uName = CommonData.getNameByID(pID.split("_")[0]);
+        String uID = pID.split("_")[0];
+        String uName = CommonData.getNameByID(uID);
         String commentDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uName, pID, "comments");
+        String commentDBDir =  TargetDir.genFileName(TargetDir.DB_FEEDS_DIR, uID, pID);
 
-        //System.out.println("Comments begins>>>>>");
         String commentsUrl = pID + "/comments?limit=1000&filter=stream&summary=1&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
         List<JsonObject> commentList = Crawl.getPages(commentsUrl);
         write(commentList, commentDir);
+        writeDB(pID, commentList, commentDBDir);
         return commentList;
     }
 
@@ -105,12 +109,25 @@ public class FeedsCrawl {
         return likeList;
     }
 
+    private static void writeDB(String pID, List<JsonObject> list, String dir) {
+        List<String> infoList = new ArrayList<>();
+        for (JsonObject jObj : list) {
+            JsonArray array = jObj.getJsonArray("data");
+            for (int i = 0; i < array.length(); i++) {
+                JsonObject obj = (JsonObject)array.get(i);
+                Comment comment = new Comment(pID, obj);
+                infoList.add(comment.toString());
+            }
+        }
+        FileProcess.write(dir, infoList);
+        DBProcess.inport(dir, CommonData.COMMETN_TABLE);
+    }
+
     private static void write(List<JsonObject> list, String dir) {
         int count = 1;
         for (JsonObject jObj : list) {
             FileProcess.write(dir + "\\" + count++, jObj.toString());
         }
-
     }
 
     private void getFeeds(File pDir) {
@@ -143,8 +160,9 @@ public class FeedsCrawl {
             pDir.delete();
     }
 
+
     public static void main(String[] args) {
         FeedsCrawl crawl = new FeedsCrawl();
-        crawl.get();
+        crawl.crawlComment("10150145806225128_10155537343990128");
     }
 }

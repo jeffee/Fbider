@@ -6,6 +6,8 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SimpleTimeZone;
 
 /**
@@ -26,8 +28,13 @@ public class Demo {
 
     public static void main(String[] args) {
        String str = String.join(";", "1", "2", "3");
-        System.out.println(str);
 
+        Map<String, Integer> map = new HashMap<>();
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("c", 3);
+
+        System.out.println(map.toString());
 //            String str = Common.parseTime("2015-04-14T06:27:16+0000");
 //        System.out.println(str);
 //        Demo demo = new Demo();

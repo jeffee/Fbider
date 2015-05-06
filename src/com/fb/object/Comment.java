@@ -1,5 +1,7 @@
 package com.fb.object;
 
+import com.fb.common.Common;
+import com.fb.common.JsonParse;
 import com.restfb.json.JsonObject;
 
 /**
@@ -14,14 +16,14 @@ public class Comment {
     private String message;
     private long likeCount;
 
-    public Comment(String pID, JsonObject jobj) {
-        this.postID = pID;
-        this.commentID = jobj.getString("id");
-        this.message = jobj.getString("message");
-        this.likeCount = jobj.getLong("like_count");
-        this.createTime = jobj.getString("created_time");
-        this.userID = jobj.getJsonObject("from").getString("id");
-        this.userName = jobj.getJsonObject("from").getString("name");
+    public Comment(String pID, JsonObject obj) {
+        postID = pID;
+        message = JsonParse.getString(obj, "message").replaceAll(";", ",").replaceAll("\n", "//").replaceAll("\"", "");
+        commentID = JsonParse.getString(obj, "id");
+        likeCount = JsonParse.getLong(obj, "like_count");
+        createTime = JsonParse.getString(obj, "created_time");
+        userID = JsonParse.getString(obj, "from", "id");
+        userName = JsonParse.getString(obj, "from", "name");
     }
 
     public String toString() {
