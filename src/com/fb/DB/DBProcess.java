@@ -85,6 +85,7 @@ public class DBProcess {
 
     }
 
+
     public static Map<String, String> getMap(String sql) {
         Map<String, String> map = new HashMap<>();
         Connection conn = null;
@@ -134,8 +135,8 @@ public class DBProcess {
 
     public static void main(String[] args) {
         String sql = "select since from "+CommonData.SUP_USER_TABLE+" WHERE uid=\"10150145806225128\"";
-        String str = DBProcess.getString(sql);
-        System.out.println(str);
+        //String str = DBProcess.getString(sql);
+        //System.out.println(str);
        // DBProcess.inport("E:/Data/facebook/raw pages/feeds/蔡英文 Tsai Ing-wen/46251501064_10152633261031065/comments/12", CommonData.COMMETN_TABLE);
         //DBProcess.get(sql, 2);
     }

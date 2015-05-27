@@ -41,12 +41,15 @@ public class CommonData {
 
 	public static String SUP_USER_TABLE="sup_user_table";
 
+	public static String CORE_USER_TABLE="core_user_table";
+
 	public static String POST_TABLE = "post_table";
 
 	public static String SUP_POST_TABLE = "sup_post_table";
 
 	public static String COMMETN_TABLE = "comment_table";
 
+	public static String RESULT_TABLE = "result_table";
 
 	static {
 		uNameMap = new JsonObject(FileProcess.readLine("E://facebook//nameMapping"));

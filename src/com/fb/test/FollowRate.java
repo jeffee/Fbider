@@ -1,4 +1,4 @@
-package com.fb.analyser;
+package com.fb.test;
 
 import com.fb.DB.DBProcess;
 import com.fb.common.CommonData;

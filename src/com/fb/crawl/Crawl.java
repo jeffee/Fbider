@@ -103,6 +103,18 @@ public class Crawl {
 		return list;
 	}
 
+	/***
+	 * 用于抓取comment、like等页面,递归实现
+	 *
+	 * **/
+	public static JsonObject getPage(String url) {
+		long beforeTime = System.currentTimeMillis();
+		JsonObject jObj = get(url);
+		long afterTime = System.currentTimeMillis();
+		System.out.println((afterTime - beforeTime) + " ms spents");
+		return jObj;
+	}
+
 	public static void main(String[] args) {
 		String url = "46251501064_10152633836061065/comments?limit=1000";
 		JsonObject obj = Crawl.get(url);

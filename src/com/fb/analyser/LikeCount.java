@@ -1,50 +1,62 @@
 package com.fb.analyser;
 
 import com.fb.DB.DBProcess;
-import com.fb.common.FileProcess;
-import com.fb.object.TargetDir;
-import com.restfb.json.JsonArray;
-import com.restfb.json.JsonObject;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Jeffee Chen on 2015/4/21.
+ * Created by Jeffee Chen on 2015/5/6.
  */
 public class LikeCount {
 
-    public static void main(String[] args) {
-        LikeCount.get(new File("E:\\Data\\facebook\\raw pages\\feeds\\洪秀柱"));
+    //"朱立伦:34,42,24|蔡英文:32,22,34"
+    public static String onMonth() {
+        String sql = "SELECT A.uid, B.uname FROM sup_user_table A LEFT JOIN user_table B USING(uid)";
+        List<String> list = DBProcess.get(sql, 2);
+        StringBuilder strb = new StringBuilder();
+        for (String info : list) {
+            String[] strs = info.split(";");
+            String uid = strs[0];
+            String uname = strs[1];
+            String result = getAvgLike(uid);
+            if (result.indexOf("[") != -1)
+                result = result.substring(1, result.indexOf("]")).replaceAll(" ", "");
+
+            strb.append(uname + ":" + fill(result) + "|");
+        }
+        return strb.toString();
     }
 
-    public static void get(File uDir) {
-        List<String> list = new ArrayList<>();
-        File[] pDirs = uDir.listFiles();
-        for (File pDir : pDirs) {
-            File likeDir = new File(pDir.getPath() + "\\likes");
-            File[] files = likeDir.listFiles();
-            File sFile = new File(likeDir.getPath() + "\\" + files.length);
-            JsonObject obj = new JsonObject(FileProcess.readLine(sFile));
-            try {
-                long count = obj.getJsonObject("summary").getLong("total_count");
-                list.add(pDir.getName() + "," + count);
-            } catch (Exception e) {
-                JsonArray array = obj.getJsonArray("data");
-                long count = 1000*(files.length-1)+array.length();
-                list.add(pDir.getName() + "," + count);
-                System.out.println("Updated");
+    private static String fill(String info) {
+        String[] result = new String[new Date().getMonth()+1];
+        if (!info.trim().equals("")) {
+        String[] strs = info.split(",");
+
+            for (String str : strs) {
+                String[] subStrs=str.split(";");
+                int month = Integer.parseInt(subStrs[0].trim());
+                result[month-1] = subStrs[1];
             }
         }
-        String dFile = TargetDir.genFileName("E:\\ex", uDir.getName(), "like");
-        FileProcess.write(dFile, list);
+
+        StringBuilder strb = new StringBuilder();
+        for (int i=0;i<result.length;i++) {
+            if (result[i]==null||result[i].equals(""))
+                strb.append(",0");
+            else
+                strb.append(","+result[i]);
+        }
+        return strb.toString().substring(1);
     }
 
-    public void onMonth(String uid) {
-        String[] times={"2015-01-01",""};
-        String sql = "select a.postID, b.num from post_table a INNER JOIN likeTable b on a.postID=b.postID \n" +
-                "where userID='"+uid+"' and a.createTime>";
-        List<String> list = DBProcess.get(sql, 2);
+    private static String getAvgLike(String uid) {
+        String sql = "SELECT Month(createTime), ceil(AVG(likeCount)) from post_table WHERE userID='"+uid+"' GROUP BY Month(createTime)";
+        List<String> rList = DBProcess.get(sql, 2);
+        return rList.toString();
+    }
+    public static void main(String[] args) {
+        String info = LikeCount.onMonth();
+        System.out.println(info);
     }
 }

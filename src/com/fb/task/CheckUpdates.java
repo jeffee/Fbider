@@ -13,7 +13,7 @@ public class CheckUpdates {
 
 
     private static Map<String, String> getUpdateTimes(){
-        String sql = "select uid, since from " + CommonData.SUP_USER_TABLE;
+        String sql = "select uid, since from " + CommonData.CORE_USER_TABLE;
         return DBProcess.getMap(sql);
     }
 
@@ -30,6 +30,8 @@ public class CheckUpdates {
             int count = single.get(since);
 
             String newSince = single.getSince();       //更新时间标记
+            System.out.println("the new since is"+newSince);
+
             if (newSince != null) {
                 timeMap.put(uid, newSince);
                 updateTime(uid, newSince);
@@ -45,7 +47,7 @@ public class CheckUpdates {
     }
 
     private static void updateTime(String uid, String since) {
-        String sql = "update " + CommonData.SUP_USER_TABLE + " set since='" + since + "' where uid='" + uid + "'";
+        String sql = "update " + CommonData.CORE_USER_TABLE + " set since='" + since + "' where uid='" + uid + "'";
         DBProcess.update(sql);
     }
 

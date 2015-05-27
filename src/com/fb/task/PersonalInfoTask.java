@@ -38,6 +38,7 @@ public class PersonalInfoTask {
                     String info = iterator.next();
                     String[] infoArray = info.split(";");
                     JsonObject obj = Crawl.get(infoArray[0]+"?");
+                    SupUser.update(obj);
                     String date = format.format(new Date());
                     String dFile = TargetDir.genFileName(TargetDir.PERSONAL_DIR, infoArray[1], date);
                     FileProcess.write(dFile, obj.toString());

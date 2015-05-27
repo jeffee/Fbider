@@ -1,8 +1,11 @@
 package com.fb.task;
 
 import com.fb.DB.DBProcess;
+import com.fb.DB.PostDB;
+import com.fb.DB.SupPostDB;
 import com.fb.common.CommonData;
 import com.fb.common.FileProcess;
+import com.fb.common.Parse;
 import com.fb.crawl.Crawl;
 import com.fb.object.Comment;
 import com.fb.object.TargetDir;
@@ -43,9 +46,11 @@ public class CommentUpdate {
             }
 
             JsonObject lastJobj = jsonList.get(jsonList.size() - 1);
-            String after = lastJobj.getJsonObject("paging").getJsonObject("cursors").getString("after");
-            sql = String.format("insert into %s values ('%s','','','2015-01-01','2015-01-01') on duplicate key update commentAfter='%s'", CommonData.SUP_POST_TABLE, strs[0], after);
-            DBProcess.update(sql);
+            String after = Parse.getAfter(lastJobj);
+            SupPostDB.updateCommentAfter(strs[0], after);
+
+            long count = lastJobj.getJsonObject("summary").getLong("total_count");
+            PostDB.updateCommentCount(strs[0], count);
 
             System.out.println(strs[0] + " updated");
             String uname = CommonData.getNameByID(strs[0].split("_")[0]);

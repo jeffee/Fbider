@@ -26,7 +26,7 @@ public class FileProcess {
 	}
 	
 	/***如果文件夹存在返回true，否则创建文件夹并返回false***/
-	public static boolean checkDir(String dirPath){
+	private static boolean checkDir(String dirPath){
 		File file = new File(dirPath);
 		if(!file.exists()||!file.isDirectory()){
 			file.mkdirs();

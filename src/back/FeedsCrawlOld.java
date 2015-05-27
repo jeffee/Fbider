@@ -1,4 +1,4 @@
-package com.fb.task;
+package back;
 
 import com.fb.DB.DBProcess;
 import com.fb.DB.PostDB;
@@ -19,11 +19,12 @@ import java.util.List;
 /**
  * Created by Jeffee Chen on 2015/4/3.
  * 获取所有的comments和likes
+ * 旧版本，like直接提取内容，存储上次的位置，新的版本中只提取like的条数，不获取具体信息
  */
-public class FeedsCrawl {
+public class FeedsCrawlOld {
     private List<String> idList;
 
-    public FeedsCrawl() {
+    public FeedsCrawlOld() {
         idList = new ArrayList<>();
     }
 
@@ -58,21 +59,29 @@ public class FeedsCrawl {
     }
 
 
-    public void getFeedsByID(String pID, String createdTime) {
+    public List<String> getFeedsByID(String pID, String createdTime) {
+        List<String> list = new ArrayList<>();
         String uName = CommonData.getNameByID(pID.split("_")[0]);
         String likeDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uName, pID, "likes");
         if (new File(likeDir).exists()) {
             System.out.println("Skip");
-            return;
+            return list;
         }
 
         idList.add(pID);
         System.out.println("post " + pID + " begins:>>>");
 
         List<JsonObject> commentList = crawlComment(pID);
-        long likeCount = crawlLikes(pID);
+        List<JsonObject> likeList = crawlLikes(pID);
+        long likeCount = 0;
         long commentCount = 0;
+        String likeAfter = "";
         String commentAfter = "";
+        if (likeList.size() >= 1) {
+            JsonObject obj = likeList.get(likeList.size() - 1);
+            likeCount = Parse.getTotalCount(obj);
+            likeAfter = Parse.getAfter(obj);
+        }
 
         if (commentList.size() >= 1) {
             JsonObject obj = commentList.get(commentList.size() - 1);
@@ -80,10 +89,12 @@ public class FeedsCrawl {
             commentAfter = Parse.getAfter(obj);
         }
 
-        SupPostDB.insert(pID, commentAfter, "", createdTime);
+        SupPostDB.insert(pID, commentAfter, likeAfter, createdTime);
         PostDB.updateTotalCount(pID, likeCount, commentCount);
 
+        list.add(pID + ";" + commentAfter + ";" + likeAfter);
         System.out.println(pID + " post is finished!");
+        return list;
     }
 
     public static List<JsonObject> crawlComment(String pID) {
@@ -99,16 +110,14 @@ public class FeedsCrawl {
         return commentList;
     }
 
-    public long crawlLikes(String pID) {
+    public List<JsonObject> crawlLikes(String pID) {
+        String uName = CommonData.getNameByID(pID.split("_")[0]);
+        String likeDir = TargetDir.genFileName(TargetDir.RAW_FEEDS_DIR, uName, pID, "likes");
         System.out.println("Likes begins>>>>>>>>");
-        String likesUrl = pID + "/likes?limit=0&summary=1&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
-        JsonObject obj = Crawl.getPage(likesUrl);
-        try {
-            long count = obj.getJsonObject("summary").getLong("total_count");
-            return count;
-        } catch (Exception e) {
-            return 0;
-        }
+        String likesUrl = pID + "/likes?limit=1000&summary=1&access_token=" + CommonData.MY_ACCESS_TOKEN + "&";
+        List<JsonObject> likeList = Crawl.getPages(likesUrl);
+        write(likeList, likeDir);
+        return likeList;
     }
 
     private static void writeDB(String pID, List<JsonObject> list, String dir) {
@@ -164,7 +173,7 @@ public class FeedsCrawl {
 
 
     public static void main(String[] args) {
-        FeedsCrawl crawl = new FeedsCrawl();
+        FeedsCrawlOld crawl = new FeedsCrawlOld();
         crawl.getFeedsByID("46251501064_10152659782201065", "2015-04-30 02:37:31");
         //crawl.crawlComment("10150145806225128_10155537343990128");
     }

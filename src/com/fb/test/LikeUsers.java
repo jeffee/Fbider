@@ -1,4 +1,4 @@
-package com.fb.analyser;
+package com.fb.test;
 
 import com.fb.common.FileProcess;
 import com.restfb.json.JsonArray;

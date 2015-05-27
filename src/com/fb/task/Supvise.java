@@ -14,7 +14,7 @@ public class Supvise {
     public static void sup() {
         String uid = "10150145806225128";
         String since = "1430384760";
-        String sql = "select since from "+CommonData.SUP_USER_TABLE+" WHERE uid=\"10150145806225128\"";
+        String sql = "select since from "+CommonData.CORE_USER_TABLE+" WHERE uid=\"10150145806225128\"";
         since = DBProcess.getString(sql);
       //  String uid = "754944064621165";
        // String since = "2015-04-21";
@@ -42,7 +42,7 @@ public class Supvise {
         }
     }
     private static void updateTime(String uid, String since) {
-        String sql = "update " + CommonData.SUP_USER_TABLE + " set since='" + since + "' where uid='" + uid + "'";
+        String sql = "update " + CommonData.CORE_USER_TABLE + " set since='" + since + "' where uid='" + uid + "'";
         DBProcess.update(sql);
     }
 

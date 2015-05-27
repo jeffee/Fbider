@@ -19,7 +19,9 @@ public class Post {
 	private String message;
 	private String type;
 	private String objectID;
-	private long shareCount;
+	private long likeCount = 0;
+	private long commentCount = 0;
+	private long shareCount = 0;
 	private String userID;
 	private String postID;
 	
@@ -39,9 +41,10 @@ public class Post {
 	
 	
 	public String toString(){
-		return postID+";"+userID+";"+objectID+";"+statusType+";"+type+";"+createTime+";"+updateTime+";"+message+";"+shareCount+";"+link;
+		return postID+";"+userID+";"+objectID+";"+statusType+";"+type+";"+createTime+";"+updateTime+";"+message+";"+shareCount+";"+likeCount+";"+commentCount+";"+link;
 	}
-	
+
+
 
 	public static void main(String[] args) {
 		String str = "2012-07-07T11:12:54+0000";

@@ -22,6 +22,13 @@ public class Parse {
         return Common.parseTime(time);
     }
 
+    public static long getTotalCount(JsonObject jobj) {
+        try {
+            return jobj.getJsonObject("summary").getLong("total_count");
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     public static void main(String[] args) {
 
