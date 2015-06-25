@@ -10,9 +10,12 @@ package com.fb.common;
 
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import com.fb.DB.DBProcess;
 import com.fb.crawl.Crawl;
 import com.restfb.json.JsonObject;
 import com.restfb.types.Post;
@@ -31,9 +34,10 @@ public class CommonData {
 
 	public final static SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBACocejqsiSjlHQQq5ZCI21ZArkwqWZCtoyaDZBEV4SJprR1Vn5gbDe9babcf0rD7ZBU5NXXqI46W9aVSCirRAraqce4LLIZCNfDaIlXaSG50FN5dGY7yJp2mNQVZAJTlk4fkKmWcIJ8IyG0YnZCtJGXNi9xYTdQPVsZBMs6ZBuzsBri7XYcJZBeRygZD";
+	//public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBACocejqsiSjlHQQq5ZCI21ZArkwqWZCtoyaDZBEV4SJprR1Vn5gbDe9babcf0rD7ZBU5NXXqI46W9aVSCirRAraqce4LLIZCNfDaIlXaSG50FN5dGY7yJp2mNQVZAJTlk4fkKmWcIJ8IyG0YnZCtJGXNi9xYTdQPVsZBMs6ZBuzsBri7XYcJZBeRygZD";
 
-	private static JsonObject uNameMap;
+	public static String MY_ACCESS_TOKEN = "CAAUD17UpsnUBAPLRDbvUKfZB6ZCAuvpu4TEsbsdARSdEEv1DCmAoBODdZCRS9sxqAE8zWDRWD9YG6fHfXxToZBJgPMNonrKTSCW9KyHSLH6Rx4Gc1LOVBuO3I3ZBw7RlH5tImoEc5K8PatFP6vCnDcNgB1Q8tLQTZBuBTZCotIezFfJksVDUdnxQBZCibh8ZCxfAZD";
+	private static Map<String, String> uNameMap;
 
 	private static List<String> userList;
 
@@ -52,7 +56,7 @@ public class CommonData {
 	public static String RESULT_TABLE = "result_table";
 
 	static {
-		uNameMap = new JsonObject(FileProcess.readLine("E://facebook//nameMapping"));
+		initMap();
 		userList = new LinkedList<>();
 	}
 
@@ -61,13 +65,22 @@ public class CommonData {
 	}
 
 	public static String getNameByID(String uid) {
-		try {
-			return uNameMap.getString(uid);
-		} catch (Exception e) {
+		if (uNameMap.get(uid)!=null){
+			return uNameMap.get(uid);
+		} else {
 			String uName = Crawl.getNameByID(uid);
 			uNameMap.put(uid, uName);
 			FileProcess.write("E://facebook//nameMapping", uNameMap.toString());
 			return uName;
+		}
+	}
+	private static void initMap(){
+		uNameMap = new HashMap<>();
+		String sql = "SELECT uid, uname from user_table";
+		List<String> list = DBProcess.get(sql, 2);
+		for (String info : list) {
+			String[] strs = info.split(";");
+			uNameMap.put(strs[0].trim(), strs[1].trim());
 		}
 	}
 }

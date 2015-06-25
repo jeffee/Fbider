@@ -27,9 +27,11 @@ public class SupUser {
         if (DBProcess.get(sql, 1).size() < 1) {       //不存在
             insertSupUser(uid);
         }
+
         System.out.println(CommonData.getNameByID(uid)+" has been added!");
     }
 
+    /***更新用户信息，主要是关注数量和讨论数量**/
     public static void update(JsonObject obj) {
         String uid = obj.getString("id");
         long likeCount = obj.getLong("likes");
@@ -57,7 +59,8 @@ public class SupUser {
     }
 
     public static void main(String[] args) {
-        SupUser.addSupUser("1406096703043863");
+        SupUser.addSupUser("259369087577045");
+        SupUser.insertCoreUser("259369087577045");
 //        List<String> list = FileProcess.read("E:\\Data\\facebook\\newUser.txt");
 //        for (String info : list) {
 //

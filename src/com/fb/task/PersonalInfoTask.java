@@ -18,9 +18,9 @@ public class PersonalInfoTask {
 
     static int count = 0;
 
-    private static final long DAY_PERIOD = 12 * 60 * 60 * 1000;
+    private static final long DAY_PERIOD = 24 * 60 * 60 * 1000;
 
-    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH");
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     public static void main(String[] args) {
         operateOnTime();
     }
@@ -33,9 +33,7 @@ public class PersonalInfoTask {
             public void run() {
                 String sql = "select uid, uname from " + CommonData.USER_TABLE;
                 List<String> list = DBProcess.get(sql, 2);
-                Iterator<String> iterator = list.iterator();
-                while (iterator.hasNext()) {
-                    String info = iterator.next();
+                for (String info:list) {
                     String[] infoArray = info.split(";");
                     JsonObject obj = Crawl.get(infoArray[0]+"?");
                     SupUser.update(obj);
@@ -55,4 +53,8 @@ public class PersonalInfoTask {
 
     }
 
+    private static void isertNewLike(JsonObject obj, String date) {
+        long count = obj.getLong("likes");
+        String sql = "insert into ";
+    }
 }

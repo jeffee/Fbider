@@ -88,7 +88,7 @@ public class Crawl {
 		List<JsonObject> list = new ArrayList<>();
 		String next;
 		JsonObject jObj = get(url);
-		if(jObj.getJsonArray("data").length()<1)		//拿到的数据为空，直接返回
+		if(jObj==null || jObj.getJsonArray("data").length()<1)		//拿到的数据为空，直接返回
 			return list;
 
 		list.add(jObj);					//存储当前数据
@@ -117,7 +117,8 @@ public class Crawl {
 
 	public static void main(String[] args) {
 		String url = "46251501064_10152633836061065/comments?limit=1000";
-		JsonObject obj = Crawl.get(url);
+		JsonObject obj = Crawl.get("10150145806225128?");
+
 		FileProcess.write("E:\\cai.txt", obj.toString());
 	}
 

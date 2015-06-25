@@ -47,6 +47,8 @@ public class PostPage {
     }
 
     private void getPage(JsonObject jObj) {
+        if (jObj==null)
+            return;
         JsonArray array = jObj.getJsonArray("data");
         if (array.length() < 1)
             return;
