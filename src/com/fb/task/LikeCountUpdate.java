@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 更新like_table中的likecount
  * Created by Jeffee Chen on 2015/5/21.
  */
 public class LikeCountUpdate {

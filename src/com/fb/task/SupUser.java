@@ -18,7 +18,7 @@ public class SupUser {
      * @param uid 用户的id
      * ***/
     public static void addSupUser(String uid) {
-        String sql = "select * from " + CommonData.USER_TABLE +" where uid='"+uid+"'";
+        String sql = "select * from " + CommonData.USER_TABLE +" where userid='"+uid+"'";
         if (DBProcess.get(sql, 1).size() < 1) {       //不存在
             FBUser user = new FBUser(Crawl.get(uid + "?"));
             insertUser(user);
@@ -41,7 +41,7 @@ public class SupUser {
     }
 
     private static void insertUser(FBUser user) {
-        String sql = "insert into " + CommonData.USER_TABLE + " (uid, uname, about, category, likes, talking_count) values('";
+        String sql = "insert into " + CommonData.USER_TABLE + " (userid, uname, about, category, likes, talking_count) values('";
         sql += user.getId() + "','" + user.getName() + "','" + user.getAbout() + "','" + user.getCategory() + "'," + user.getLikes() + "," + user.getTalking_about_count() + ")";
         DBProcess.update(sql);
     }
@@ -59,8 +59,8 @@ public class SupUser {
     }
 
     public static void main(String[] args) {
-        SupUser.addSupUser("259369087577045");
-        SupUser.insertCoreUser("259369087577045");
+        SupUser.addSupUser("781585891901624");
+        SupUser.insertCoreUser("781585891901624");
 //        List<String> list = FileProcess.read("E:\\Data\\facebook\\newUser.txt");
 //        for (String info : list) {
 //

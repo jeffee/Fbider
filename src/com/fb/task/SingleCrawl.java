@@ -117,7 +117,7 @@ public class SingleCrawl {
     }
 
     public static void main(String[] args) {
-        SingleCrawl crawl = new SingleCrawl("46251501064");
-        crawl.get("2015-01-01", "2015-03-01");
+        SingleCrawl crawl = new SingleCrawl("150336441057");
+        crawl.get("2015-01-01");
     }
 }

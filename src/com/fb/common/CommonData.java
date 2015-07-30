@@ -76,7 +76,7 @@ public class CommonData {
 	}
 	private static void initMap(){
 		uNameMap = new HashMap<>();
-		String sql = "SELECT uid, uname from user_table";
+		String sql = "SELECT userid, uname from user_table";
 		List<String> list = DBProcess.get(sql, 2);
 		for (String info : list) {
 			String[] strs = info.split(";");

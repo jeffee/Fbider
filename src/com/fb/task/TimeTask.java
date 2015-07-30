@@ -29,6 +29,8 @@ public class TimeTask {
 
             @Override
             public void run() {
+                Discarder.discard();            //将30天前的内容从关注列表中删除
+
                 CheckUpdates.update();                  //更新监控用户新发布的posts
 
                 FeedsCrawl feedsCrawl = new FeedsCrawl();             //抓取上一步操作所获取到的新posts的评论和点赞

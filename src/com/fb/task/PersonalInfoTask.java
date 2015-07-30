@@ -31,7 +31,7 @@ public class PersonalInfoTask {
         TimerTask dailyTask = new TimerTask() {
             @Override
             public void run() {
-                String sql = "select uid, uname from " + CommonData.USER_TABLE;
+                String sql = "select userid, uname from " + CommonData.USER_TABLE;
                 List<String> list = DBProcess.get(sql, 2);
                 for (String info:list) {
                     String[] infoArray = info.split(";");
@@ -53,8 +53,4 @@ public class PersonalInfoTask {
 
     }
 
-    private static void isertNewLike(JsonObject obj, String date) {
-        long count = obj.getLong("likes");
-        String sql = "insert into ";
-    }
 }
